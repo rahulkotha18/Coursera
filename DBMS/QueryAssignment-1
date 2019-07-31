@@ -1,0 +1,69 @@
+
+1)    Find out the PG-13 rated comedy movies. DO NOT use the film_list table.
+
+NESTED QUERY:
+	select film_id,title from film where film_id in
+	   (select film_id from film_category where (category_id in (select category_id from category where name='Comedy')) and 			rating='PG-13') ;
+
+
+2)    Find out the top 3 rented horror movies.
+
+JOIN:
+	select f.film_id,f.title from rental r,inventory i,film f,film_category fc,category c 
+	where (r.inventory_id = i.inventory_id) and (i.film_id = f.film_id) and (f.film_id=fc.film_id) 
+	and (fc.category_id=c.category_id) and (c.name='Horror') group by f.film_id order by count(*)DESC LIMIT 3;
+	
+
+
+3)    Find out the list of customers from India who have rented sports movies.
+
+	select 	customer.customer_id,customer.first_name,customer.last_name from 
+	rental Inner join customer on(rental.customer_id=customer.customer_id)
+	inner join address on(customer.address_id=address.address_id)
+	inner join city on(address.city_id=city.city_id)
+	inner join country on(city.country_id=country.country_id) 
+	where country.country='India' and rental.rental_id in 
+	(select r.rental_id from rental r,inventory i,film f,film_category fc,category c 
+	where (r.inventory_id = i.inventory_id) and (i.film_id = f.film_id) and (f.film_id=fc.film_id) 
+	and (fc.category_id=c.category_id) and (c.name='Sports'));
+
+
+4)    Find out the list of customers from Canada who have rented “NICK WAHLBERG” movies.
+	
+	 select first_name,last_name from customer where customer_id in (
+    	 select rental.customer_id from rental inner join inventory on(rental.inventory_id=inventory.inventory_id) where inventory.film_id in 		 (select film_id from film_actor where actor_id in (select actor_id from actor_info where first_name='NICK' and last_name='WAHLBERG')) 
+    	 and rental.customer_id in(
+    	 select customer.customer_id from 
+    	 rental Inner join customer on(rental.customer_id=customer.customer_id)
+    	 inner join address on(customer.address_id=address.address_id)
+    	 inner join city on(address.city_id=city.city_id)
+    	 inner join country on(city.country_id=country.country_id) 
+    	 where country.country='Canada')
+    	 );
+	
+
+5)    Find out the number of movies in which “SEAN WILLIAMS” acted.
+
+	select count(*) from film_actor where actor_id in (select actor_id from actor_info where first_name='SEAN' and last_name='WILLIAMS');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
